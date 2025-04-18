@@ -32,6 +32,12 @@ object WeatherRepository {
        val json = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityName&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
 
         val result = gson.fromJson(json, WeatherAPIResult::class.java)
+        result.list.forEach {
+            it.weather.forEach {
+                it.icon = "https://openweathermap.org/img/wn/${it.icon}@4x.png"
+            }
+        }
+
         return result.list
     }
 
@@ -59,4 +65,5 @@ data class WeatherAPIResult(val list:List<WeatherBean>)
 data class WeatherBean(val id :Long, val name:String, val wind:WindBean, val weather:List<DescriptionBean>, val main:TempBean )
 data class WindBean(val speed :Double)
 data class TempBean(val temp :Double)
-data class DescriptionBean(val description :String, val icon:String)
+data class DescriptionBean(val description :String, var icon:String)
+
