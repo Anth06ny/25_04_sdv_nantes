@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 fun main() {
+
+
     val viewModel = MainViewModel()
     viewModel.loadWeathers("")
     //viewModel.loadWeathers("Paris")

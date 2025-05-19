@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">25_04_sdv_nantes</string>
+    <string name="bt_load">Load data</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>
