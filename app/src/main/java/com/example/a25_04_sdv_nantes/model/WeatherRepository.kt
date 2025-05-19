@@ -32,6 +32,7 @@ object WeatherRepository {
        val json = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityName&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
 
         val result = gson.fromJson(json, WeatherAPIResult::class.java)
+        //modifie le nom de l'image par l'url complète
         result.list.forEach {
             it.weather.forEach {
                 it.icon = "https://openweathermap.org/img/wn/${it.icon}@4x.png"
