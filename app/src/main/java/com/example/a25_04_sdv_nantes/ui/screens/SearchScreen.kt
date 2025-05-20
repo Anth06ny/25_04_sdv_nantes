@@ -1,5 +1,6 @@
 package com.example.a25_04_sdv_nantes.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,6 +47,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.example.a25_04_sdv_nantes.R
 import com.example.a25_04_sdv_nantes.model.PictureBean
+import com.example.a25_04_sdv_nantes.ui.MyError
 import com.example.a25_04_sdv_nantes.ui.theme._25_04_sdv_nantesTheme
 import com.example.a25_04_sdv_nantes.viewmodel.MainViewModel
 
@@ -76,6 +79,9 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
     var searchText = remember { mutableStateOf("") }
     val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
     //.filter { it.title.contains(searchText.value, true) }
+    val runInProgress = mainViewModel.runInProgress.collectAsStateWithLifecycle().value
+
+    val errorMessage = mainViewModel.errorMessage.collectAsStateWithLifecycle().value
 
     Column(
         modifier = modifier
@@ -83,9 +89,16 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        SearchBar(searchText = searchText,
-            onSearchClic = { mainViewModel.loadWeathers(searchText.value)}
-            )
+        SearchBar(
+            searchText = searchText,
+            onSearchClic = { mainViewModel.loadWeathers(searchText.value) }
+        )
+
+        MyError(errorMessage = errorMessage)
+
+        AnimatedVisibility(visible = runInProgress){
+            CircularProgressIndicator()
+        }
 
         //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
         LazyColumn(
@@ -129,7 +142,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>, onSearchClic : ()->Unit = {}) {
+fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>, onSearchClic: () -> Unit = {}) {
 
 
     TextField(
@@ -153,7 +166,7 @@ fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>, o
         //},
 
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Définir le bouton "Entrée" comme action de recherche
-        keyboardActions = KeyboardActions(onSearch = { onSearchClic()}), // Déclenche l'action définie
+        keyboardActions = KeyboardActions(onSearch = { onSearchClic() }), // Déclenche l'action définie
         //Comment le composant doit se placer
         modifier = modifier
             .fillMaxWidth() // Prend toute la largeur
