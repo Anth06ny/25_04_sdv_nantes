@@ -42,12 +42,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.example.a25_04_sdv_nantes.R
 import com.example.a25_04_sdv_nantes.model.PictureBean
 import com.example.a25_04_sdv_nantes.ui.MyError
+import com.example.a25_04_sdv_nantes.ui.Routes
 import com.example.a25_04_sdv_nantes.ui.theme._25_04_sdv_nantesTheme
 import com.example.a25_04_sdv_nantes.viewmodel.MainViewModel
 
@@ -74,7 +76,11 @@ fun SearchScreenPreview() {
 }
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = viewModel()) {
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    mainViewModel: MainViewModel = viewModel(),
+    navHostController: NavHostController? = null
+) {
 
     var searchText = remember { mutableStateOf("") }
     val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
@@ -96,7 +102,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
 
         MyError(errorMessage = errorMessage)
 
-        AnimatedVisibility(visible = runInProgress){
+        AnimatedVisibility(visible = runInProgress) {
             CircularProgressIndicator()
         }
 
@@ -106,7 +112,12 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
             modifier = Modifier.weight(1f)
         ) {
             items(list.size) {
-                PictureRowItem(data = list[it])
+                PictureRowItem(
+                    data = list[it],
+                    onPictureClick = {
+                        navHostController?.navigate(Routes.DetailRoute(list[it].id))
+                    }
+                )
             }
 
         }
@@ -176,7 +187,7 @@ fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>, o
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable //Composable affichant 1 PictureBean
-fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
+fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean, onPictureClick: () -> Unit) {
 
     var expended = remember { mutableStateOf(false) }
 
@@ -201,6 +212,7 @@ fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
             modifier = Modifier
                 .heightIn(max = 100.dp) //Sans hauteur il prendra tous l'écran
                 .widthIn(max = 100.dp)
+                .clickable(onClick = onPictureClick)
         )
 
         Column(

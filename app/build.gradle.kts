@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -38,12 +40,17 @@ android {
 
 dependencies {
 
+    //requetes
     implementation("com.squareup.okhttp3:okhttp:+")
+    //parsing json
     implementation("com.google.code.gson:gson:+")
-
+//composant graphique image url
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-
+//pour le =viewModel
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+//Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.+")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.+")
 
 
     implementation(libs.androidx.core.ktx)
