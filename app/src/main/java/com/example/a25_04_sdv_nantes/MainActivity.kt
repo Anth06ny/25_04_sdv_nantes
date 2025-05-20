@@ -15,6 +15,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.example.a25_04_sdv_nantes.ui.screens.SearchScreen
 import com.example.a25_04_sdv_nantes.ui.theme._25_04_sdv_nantesTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,43 +27,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             _25_04_sdv_nantesTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Experience(
+                    SearchScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Experience(modifier: Modifier = Modifier) {
-    var expanded = remember { mutableStateOf(false) }
-
-    Column(modifier = modifier) {
-        ElevatedButton(
-            onClick = { expanded.value = !expanded.value }
-        ) {
-            Text(if (expanded.value) "Show less" else "Show more")
-        }
-
-        ElevatedButton(
-            onClick = { expanded.value = !expanded.value },
-        ) {
-            Text(if (expanded.value) "Show less" else "Show more")
-        }
-        MyButton(expanded)
-        MyButton()
-    }
-}
-
-//Permet d'écouter l'état en dehors de la méthode
-@Composable
-fun MyButton(expanded: MutableState<Boolean> = remember { mutableStateOf(false) }) {
-
-    ElevatedButton(
-        onClick = { expanded.value = !expanded.value },
-    ) {
-        Text(if (expanded.value) "Show less" else "Show more")
     }
 }

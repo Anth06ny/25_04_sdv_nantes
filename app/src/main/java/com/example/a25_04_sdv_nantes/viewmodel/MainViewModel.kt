@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a25_04_sdv_nantes.model.PictureBean
 import com.example.a25_04_sdv_nantes.model.WeatherRepository
+import com.example.a25_04_sdv_nantes.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 fun main() {
@@ -23,7 +25,7 @@ fun main() {
     println("ErrorMessage : ${viewModel.errorMessage.value}")
 }
 
-class MainViewModel : ViewModel() {
+open class MainViewModel : ViewModel() {
     //MutableStateFlow est une donnée observable
     val dataList = MutableStateFlow(emptyList<PictureBean>())
     val runInProgress = MutableStateFlow(false)
@@ -31,6 +33,10 @@ class MainViewModel : ViewModel() {
 
     init {//Création d'un jeu de donnée au démarrage
         loadFakeData()
+    }
+
+    fun add(element:PictureBean){
+
     }
 
     fun loadFakeData(runInProgress :Boolean = false, errorMessage:String = "" ) {

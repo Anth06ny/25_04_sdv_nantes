@@ -1,6 +1,8 @@
 package com.example.a25_04_sdv_nantes.ui.screens
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -31,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
@@ -47,6 +53,7 @@ import com.example.a25_04_sdv_nantes.viewmodel.MainViewModel
 )
 @Composable
 fun SearchScreenPreview() {
+
     //Il faut remplacer NomVotreAppliTheme par le thème de votre application
     //Utilisé par exemple dans MainActivity.kt sous setContent {...}
     _25_04_sdv_nantesTheme {
@@ -57,9 +64,12 @@ fun SearchScreenPreview() {
 }
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = MainViewModel()) {
+fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = viewModel()) {
 
-    val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
+
+
+    var searchText = remember { mutableStateOf("") }
+    val list = mainViewModel.dataList.collectAsStateWithLifecycle().value.filter { it.title.contains(searchText.value, true) }
 
     Column(
         modifier = modifier
@@ -67,11 +77,13 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        SearchBar()
+        SearchBar(searchText = searchText)
 
         //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1f)) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.weight(1f)
+        ) {
             items(list.size) {
                 PictureRowItem(data = list[it])
             }
@@ -80,7 +92,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
 
         Row {
             Button(
-                onClick = { /* Do something! */ },
+                onClick = { searchText.value = "" },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -109,11 +121,13 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = M
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
+fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
+
+
 
     TextField(
-        value = "", //Valeur affichée
-        onValueChange = {newValue:String -> println(newValue) }, //Nouveau texte entrée
+        value = searchText.value, //Valeur affichée
+        onValueChange = { newValue: String -> searchText.value = newValue }, //Nouveau texte entrée
         leadingIcon = { //Image d'icone
             Icon(
                 imageVector = Icons.Default.Search,
@@ -144,9 +158,13 @@ fun SearchBar(modifier: Modifier = Modifier) {
 @Composable //Composable affichant 1 PictureBean
 fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
 
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colorScheme.tertiaryContainer)) {
+    var expended = remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+    ) {
         //Permission Internet nécessaire
         GlideImage(
             model = data.url,
@@ -165,15 +183,24 @@ fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
                 .widthIn(max = 100.dp)
         )
 
-        Column(modifier = Modifier.padding(5.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxWidth()
+                .clickable {
+                    expended.value = !expended.value
+                }
+        ) {
             Text(
                 text = data.title,
                 style = MaterialTheme.typography.titleLarge
             )
+
             Text(
-                text = data.longText.take(20),
+                text = if (expended.value) data.longText else (data.longText.take(20) + "..."),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.animateContentSize()
             )
         }
     }
