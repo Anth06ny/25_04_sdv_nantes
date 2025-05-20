@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a25_04_sdv_nantes.model.PictureBean
 import com.example.a25_04_sdv_nantes.model.WeatherRepository
-import com.example.a25_04_sdv_nantes.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 fun main() {
@@ -31,13 +29,11 @@ open class MainViewModel : ViewModel() {
     val runInProgress = MutableStateFlow(false)
     val errorMessage = MutableStateFlow("")
 
-    init {//Création d'un jeu de donnée au démarrage
-        loadFakeData()
-    }
+//    init {//Création d'un jeu de donnée au démarrage
+//        //loadFakeData()
+//        loadWeathers("Nice")
+//    }
 
-    fun add(element:PictureBean){
-
-    }
 
     fun loadFakeData(runInProgress :Boolean = false, errorMessage:String = "" ) {
         this.runInProgress.value = runInProgress

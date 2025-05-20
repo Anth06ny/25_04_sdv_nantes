@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Clear
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,7 +61,11 @@ fun SearchScreenPreview() {
     //Utilisé par exemple dans MainActivity.kt sous setContent {...}
     _25_04_sdv_nantesTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            SearchScreen(modifier = Modifier.padding(innerPadding))
+
+            val mainViewModel = MainViewModel()
+            mainViewModel.loadFakeData(true, "une erreur")
+
+            SearchScreen(modifier = Modifier.padding(innerPadding), mainViewModel = mainViewModel)
         }
     }
 }
@@ -66,10 +73,9 @@ fun SearchScreenPreview() {
 @Composable
 fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = viewModel()) {
 
-
-
     var searchText = remember { mutableStateOf("") }
-    val list = mainViewModel.dataList.collectAsStateWithLifecycle().value.filter { it.title.contains(searchText.value, true) }
+    val list = mainViewModel.dataList.collectAsStateWithLifecycle().value
+    //.filter { it.title.contains(searchText.value, true) }
 
     Column(
         modifier = modifier
@@ -77,7 +83,9 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        SearchBar(searchText = searchText)
+        SearchBar(searchText = searchText,
+            onSearchClic = { mainViewModel.loadWeathers(searchText.value)}
+            )
 
         //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
         LazyColumn(
@@ -105,7 +113,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
             }
 
             Button(
-                onClick = { /* Do something! */ },
+                onClick = { mainViewModel.loadWeathers(searchText.value) },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -121,8 +129,7 @@ fun SearchScreen(modifier: Modifier = Modifier, mainViewModel: MainViewModel = v
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
-
+fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>, onSearchClic : ()->Unit = {}) {
 
 
     TextField(
@@ -145,8 +152,8 @@ fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
         //Text("Recherche")
         //},
 
-        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Définir le bouton "Entrée" comme action de recherche
-        //keyboardActions = KeyboardActions(onSearch = {onSearchAction()}), // Déclenche l'action définie
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), // Définir le bouton "Entrée" comme action de recherche
+        keyboardActions = KeyboardActions(onSearch = { onSearchClic()}), // Déclenche l'action définie
         //Comment le composant doit se placer
         modifier = modifier
             .fillMaxWidth() // Prend toute la largeur
